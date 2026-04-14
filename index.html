@@ -68,22 +68,27 @@
             justify-content: space-between;
             align-items: center;
         }
-        /* 核心修改：导航项容器拆分层级 */
+        /* 核心修改1：重构nav-item层级 - 文本单独分层 */
         .nav-item {
             color: #fff;
             font-size: 18px;
             cursor: pointer;
             padding: 10px 20px;
-            position: relative;
+            position: relative; /* 作为子元素的定位容器 */
             transition: all 0.3s ease;
-            z-index: 150; /* 文本层级更高 */
+            z-index: 150; 
             transform-origin: center;
             height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        /* 底标容器（单独层级，低于文本） */
+        /* 新增：文本层 - 单独控制层级，确保高于底标 */
+        .nav-item .nav-text {
+            position: relative; /* 开启z-index生效 */
+            z-index: 2; /* 文本层级 > 底标层级(1) */
+        }
+        /* 核心修改2：底标容器（伪元素）层级/位置优化 */
         .nav-item::after {
             content: "";
             position: absolute;
@@ -95,19 +100,21 @@
             background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/xuanz.png") center center no-repeat;
             background-size: 100% 100%;
             box-sizing: border-box;
-            z-index: 100; /* 底标层级低于文本（100 < 101） */
+            z-index: 1; /* 明确低于文本层(z-index:2) */
             opacity: 0; /* 默认隐藏 */
+            /* 新增：防止底标超出容器，不挤压文本 */
+            pointer-events: none; /* 底标不响应点击，不影响文本交互 */
         }
         /* 选中时显示底标 */
         .nav-item.active::after {
             opacity: 1; /* 显示底标 */
         }
-        /* 导航hover放大效果 */
-        .nav-item:hover {
+        /* 导航hover放大效果（仅放大文本层，底标位置不变） */
+        .nav-item:hover .nav-text {
             transform: scale(1.1);
         }
-        /* 导航选中效果 */
-        .nav-item.active {
+        /* 导航选中效果（仅修改文本层样式） */
+        .nav-item.active .nav-text {
             font-size: 22px;
             color: #ffd700;
             font-weight: bold;
@@ -229,11 +236,12 @@
         <!-- 导航栏 -->
         <div class="nav-bar">
             <div class="nav-items">
-                <div class="nav-item active">官网首页</div>
-                <div class="nav-item">魔法小镇</div>
+                <!-- 核心修改3：给导航文本包裹span层 -->
+                <div class="nav-item active"><span class="nav-text">官网首页</span></div>
+                <div class="nav-item"><span class="nav-text">魔法小镇</span></div>
                 <div class="nav-logo"></div>
-                <div class="nav-item">游戏特色</div>
-                <div class="nav-item">小镇简报</div>
+                <div class="nav-item"><span class="nav-text">游戏特色</span></div>
+                <div class="nav-item"><span class="nav-text">小镇简报</span></div>
             </div>
         </div>
 
