@@ -13,16 +13,16 @@
             font-family: "Microsoft Yahei", sans-serif;
         }
 
-        /* 页面基础容器（1920×1080 固定画布） */
+        /* 页面基础容器（适配浏览器窗口） */
         .page-container {
-            width: 1920px;
-            height: 1080px;
+            width: 100vw; /* 视口宽度 */
+            height: 100vh; /* 视口高度 */
             margin: 0 auto;
             position: relative;
             overflow: hidden;
         }
 
-        /* 1. 背景图样式 */
+        /* 1. 背景图样式（适配浏览器） */
         .bg-layer {
             width: 100%;
             height: 100%;
@@ -32,23 +32,23 @@
             z-index: 1;
         }
         .bg-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover; /* 保持背景图比例填充 */
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover; /* 保持比例填充整个视口 */
         }
 
-        /* 2. 导航栏样式（固定顶部） */
+        /* 2. 导航栏样式（置顶+文案层级在上） */
         .nav-bar {
             width: 100%;
-            height: 204px; /* 适配导航底版高度，可调整 */
+            height: 204px;
             position: absolute;
-            top: 0;
+            top: 0; /* 紧贴顶部 */
             left: 0;
-            z-index: 100;
+            z-index: 100; /* 确保高于底版背景 */
             display: flex;
-            align-items: center;
+            align-items: center; /* 垂直居中（可调整为flex-start更靠上） */
             justify-content: center;
-            background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/top.png") center center no-repeat; /* 附件2导航底版，替换为你的路径 */
+            background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/top.png") center center no-repeat;
             background-size: 100% 100%;
         }
         .nav-items {
@@ -64,11 +64,12 @@
             padding: 10px 20px;
             position: relative;
             transition: all 0.3s ease;
+            z-index: 101; /* 确保文案在导航底版之上 */
         }
         /* 导航选中效果：文字放大+高亮+底标 */
         .nav-item.active {
             font-size: 22px;
-            color: #ffd700; /* 金色高亮，可调整 */
+            color: #ffd700;
             font-weight: bold;
         }
         .nav-item.active::after {
@@ -79,15 +80,16 @@
             transform: translateX(-50%);
             width: 30px;
             height: 10px;
-            background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/xuanz.png") center center no-repeat; /* 附件3选中底标，替换为你的路径 */
+            background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/xuanz.png") center center no-repeat;
             background-size: 100% 100%;
         }
         /* Logo 容器（导航中间） */
         .nav-logo {
             width: 120px;
             height: 80px;
-            background: url("./logo.png") center center no-repeat; /* 游戏Logo，替换为你的路径 */
+            background: url("./logo.png") center center no-repeat;
             background-size: contain;
+            z-index: 101; /* Logo层级在上 */
         }
 
         /* 3. 大标题样式 */
@@ -99,49 +101,33 @@
             z-index: 5;
         }
         .title-img {
-            width: 800px; /* 适配标题尺寸，可调整 */
+            width: 800px;
             height: auto;
         }
 
-        /* 4. 魔法书样式（悬浮+发光+粒子效果） */
+        /* 4. 魔法书样式（仅保留悬浮，移除发光+粒子效果） */
         .magic-book-layer {
             position: absolute;
             top: 40%;
             left: 50%;
             transform: translate(-50%, -20%);
             z-index: 6;
-            animation: float 3s ease-in-out infinite; /* 悬浮动画 */
+            animation: float 3s ease-in-out infinite; /* 仅保留悬浮动画 */
         }
         .magic-book {
-            width: 300px; /* 适配魔法书尺寸，可调整 */
+            width: 300px;
             height: auto;
-            filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8)); /* 发光效果 */
+            /* 移除发光特效 */
             position: relative;
         }
-        /* 魔法粒子光效 */
-        .magic-particles {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255,215,0,0.4) 0%, rgba(255,215,0,0) 70%);
-            border-radius: 50%;
-            animation: glow 2s ease-in-out infinite alternate;
-        }
-        /* 悬浮动画 */
+        /* 悬浮动画（保留） */
         @keyframes float {
             0% { transform: translate(-50%, -20%); }
             50% { transform: translate(-50%, -15%); }
             100% { transform: translate(-50%, -20%); }
         }
-        /* 发光动画 */
-        @keyframes glow {
-            0% { opacity: 0.6; transform: scale(1); }
-            100% { opacity: 1; transform: scale(1.1); }
-        }
 
-        /* 5. 预约按钮样式 */
+        /* 5. 预约按钮样式（透明底） */
         .btn-layer {
             position: absolute;
             bottom: 20%;
@@ -150,41 +136,43 @@
             z-index: 7;
         }
         .reserve-btn {
-            width: 300px; /* 适配按钮尺寸，可调整 */
+            width: 300px;
             height: 80px;
             border: none;
             cursor: pointer;
             background-size: 100% 100%;
             background-repeat: no-repeat;
-            font-size: 0; /* 隐藏文字，用图片展示 */
+            font-size: 0;
+            background-color: transparent; /* 强制透明背景，解决白底问题 */
+            outline: none; /* 移除默认轮廓 */
         }
         /* 成为管理员按钮（默认状态） */
         .btn-admin {
-            background-image: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bottom-1.png"); /* 附件7，替换为你的路径 */
+            background-image: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bottom-1.png");
         }
         /* 预约成功按钮（切换状态） */
         .btn-success {
-            background-image: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bottom-2.png"); /* 附件8，替换为你的路径 */
-            display: none; /* 默认隐藏 */
+            background-image: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bottom-2.png");
+            display: none;
         }
 
-        /* 6. 弹窗样式（含黑色遮罩） */
+        /* 6. 弹窗样式（含黑色遮罩，移除按钮） */
         .modal-mask {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* 50%透明度黑色遮罩 */
+            background: rgba(0, 0, 0, 0.5);
             z-index: 200;
-            display: none; /* 默认隐藏 */
+            display: none;
             justify-content: center;
             align-items: center;
         }
         .modal-content {
-            width: 600px; /* 适配弹窗尺寸，可调整 */
+            width: 600px;
             height: 700px;
-            background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/tanchuang.png") center center no-repeat; /* 附件9弹窗素材，替换为你的路径 */
+            background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/tanchuang.png") center center no-repeat;
             background-size: 100% 100%;
             position: relative;
             display: flex;
@@ -192,24 +180,9 @@
             align-items: flex-end;
             padding-bottom: 120px;
         }
+        /* 移除弹窗按钮容器 */
         .modal-btns {
-            display: flex;
-            gap: 40px;
-        }
-        .modal-btn {
-            width: 180px;
-            height: 60px;
-            border: none;
-            cursor: pointer;
-            background-color: #ffd700;
-            color: #333;
-            font-size: 20px;
-            font-weight: bold;
-            border-radius: 8px;
-            transition: background-color 0.3s ease;
-        }
-        .modal-btn:hover {
-            background-color: #ffc107;
+            display: none;
         }
     </style>
 </head>
@@ -217,7 +190,7 @@
     <div class="page-container">
         <!-- 1. 背景图 -->
         <div class="bg-layer">
-            <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bg_1.png" alt="背景图" class="bg-img"> <!-- 附件4，替换为你的路径 -->
+            <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bg_1.png" alt="背景图" class="bg-img">
         </div>
 
         <!-- 2. 导航栏 -->
@@ -233,13 +206,12 @@
 
         <!-- 3. 大标题 -->
         <div class="title-layer">
-            <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/slogan.png" alt="大标题" class="title-img"> <!-- 附件5，替换为你的路径 -->
+            <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/slogan.png" alt="大标题" class="title-img">
         </div>
 
-        <!-- 4. 魔法书（含粒子光效） -->
+        <!-- 4. 魔法书（移除粒子光效元素） -->
         <div class="magic-book-layer">
-            <div class="magic-particles"></div>
-            <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/book.png" alt="魔法书" class="magic-book"> <!-- 附件6，替换为你的路径 -->
+            <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/book.png" alt="魔法书" class="magic-book">
         </div>
 
         <!-- 5. 预约按钮 -->
@@ -248,7 +220,7 @@
             <button class="reserve-btn btn-success" id="successBtn">预约成功</button>
         </div>
 
-        <!-- 6. 弹窗（含遮罩） -->
+        <!-- 6. 弹窗（含遮罩，已移除按钮） -->
         <div class="modal-mask" id="modalMask">
             <div class="modal-content">
                 <div class="modal-btns">
@@ -291,7 +263,7 @@
 
         // 4. 「加入官群」按钮点击事件（可扩展跳转逻辑）
         document.getElementById('groupBtn').addEventListener('click', () => {
-            alert('已跳转至官群页面！'); // 替换为实际跳转逻辑
+            alert('已跳转至官群页面！');
         });
     </script>
 </body>
