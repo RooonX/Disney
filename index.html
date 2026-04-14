@@ -70,7 +70,7 @@
         }
         /* 核心修改1：重构nav-item层级 - 文本单独分层 */
         .nav-item {
-            color: #fff;
+            color: #ffdd98;
             font-size: 18px;
             cursor: pointer;
             padding: 10px 20px;
@@ -88,21 +88,23 @@
             position: relative; /* 开启z-index生效 */
             z-index: 2; /* 文本层级 > 底标层级(1) */
         }
-        /* 核心修改2：底标容器（伪元素）层级/位置优化 */
+        /* 核心修改2：底标放大+向右偏移（关键调整） */
         .nav-item::after {
             content: "";
             position: absolute;
             bottom: 0;
+            /* 向右偏移：left从50%改为50% +  translateX增加20px（可调整） */
             left: 50%;
-            transform: translate(-50%) scale(1);
-            width: 168px;
-            height: 68px;
+            /* scale(1.5) 放大1.5倍 | translateX(-50% + 20px) 向右偏移20px */
+            transform: translateX(calc(-50% + 20px)) scale(1.5); 
+            /* 底标基础尺寸放大（配合scale更明显） */
+            width: 180px;
+            height: 75px;
             background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/xuanz.png") center center no-repeat;
             background-size: 100% 100%;
             box-sizing: border-box;
             z-index: 1; /* 明确低于文本层(z-index:2) */
             opacity: 0; /* 默认隐藏 */
-            /* 新增：防止底标超出容器，不挤压文本 */
             pointer-events: none; /* 底标不响应点击，不影响文本交互 */
         }
         /* 选中时显示底标 */
@@ -116,7 +118,7 @@
         /* 导航选中效果（仅修改文本层样式） */
         .nav-item.active .nav-text {
             font-size: 22px;
-            color: #ffd700;
+            color: #ffffff;
             font-weight: bold;
             transform: scale(1.1);
         }
