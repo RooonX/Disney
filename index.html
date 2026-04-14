@@ -68,49 +68,50 @@
             justify-content: space-between;
             align-items: center;
         }
+        /* 核心修改：导航项容器拆分层级 */
         .nav-item {
             color: #fff;
             font-size: 18px;
             cursor: pointer;
             padding: 10px 20px;
             position: relative;
-            transition: all 0.3s ease; /* 平滑过渡 */
-            z-index: 101;
-            transform-origin: center; /* 放大以中心为原点 */
-            /* 关键：给导航项设置固定高度，方便底标定位 */
+            transition: all 0.3s ease;
+            z-index: 101; /* 文本层级更高 */
+            transform-origin: center;
             height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
+        /* 底标容器（单独层级，低于文本） */
+        .nav-item::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translate(-50%, 0) scale(2);
+            width: 30px;
+            height: 10px;
+            background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/xuanz.png") center center no-repeat;
+            background-size: 100% 100%;
+            box-sizing: border-box;
+            z-index: 100; /* 底标层级低于文本（100 < 101） */
+            opacity: 0; /* 默认隐藏 */
+        }
+        /* 选中时显示底标 */
+        .nav-item.active::after {
+            opacity: 1; /* 显示底标 */
+        }
         /* 导航hover放大效果 */
         .nav-item:hover {
-            transform: scale(1.1); /* 放大1.1倍，可调整 */
+            transform: scale(1.1);
         }
         /* 导航选中效果 */
         .nav-item.active {
             font-size: 22px;
             color: #ffd700;
             font-weight: bold;
-            transform: scale(1.1); /* 选中时也保持放大 */
-        }
-        /* 核心修改：底标精准居中于文本下方 */
-        .nav-item.active::after {
-            content: "";
-            position: absolute;
-            /* 底标在文本正下方 */
-            bottom: -8px; 
-            left: 50%;
-            /* 同时实现水平+垂直居中 */
-            transform: translate(-50%, 0) scale(10); 
-            /* 底标尺寸（根据实际需求调整） */
-            width: 30px;
-            height: 10px;
-            /* 底标背景图居中显示 */
-            background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/xuanz.png") center center no-repeat;
-            background-size: 100% 100%;
-            /* 确保底标不超出文本范围 */
-            box-sizing: border-box;
+            transform: scale(1.1);
         }
         /* Logo 容器 */
         .nav-logo {
@@ -118,7 +119,7 @@
             height: 80px;
             background: url("./logo.png") center center no-repeat;
             background-size: contain;
-            z-index: 101;
+            z-index: 101; /* Logo层级与文本一致 */
         }
 
         /* 4. 大标题样式（调整位置避免重叠） */
