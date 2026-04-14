@@ -6,14 +6,13 @@
     <title>书境传奇 - 官网首页</title>
     <style>
         /* 1. 自定义字体引入（替换为你的字体文件路径） */
-        /* 示例：引入本地/在线字体文件，支持ttf/woff/woff2格式 */
         @font-face {
             font-family: 'GameCustomFont'; /* 自定义字体名称 */
-            src: url('font/CangErYuYangTiW01-2.ttf') format('truetype'), /* 本地ttf字体 */
-                 url('./game-font.woff2') format('woff2'); /* 可选：woff2格式（更小更快） */
+            src: url('./game-font.ttf') format('truetype'),
+                 url('./game-font.woff2') format('woff2');
             font-weight: normal;
             font-style: normal;
-            font-display: swap; /* 字体加载时不闪烁 */
+            font-display: swap;
         }
 
         /* 全局重置 */
@@ -21,7 +20,6 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            /* 全局使用自定义字体（可单独给元素设置） */
             font-family: 'GameCustomFont', "Microsoft Yahei", sans-serif;
         }
 
@@ -79,6 +77,11 @@
             transition: all 0.3s ease; /* 平滑过渡 */
             z-index: 101;
             transform-origin: center; /* 放大以中心为原点 */
+            /* 关键：给导航项设置固定高度，方便底标定位 */
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         /* 导航hover放大效果 */
         .nav-item:hover {
@@ -91,21 +94,23 @@
             font-weight: bold;
             transform: scale(1.1); /* 选中时也保持放大 */
         }
-         /* 核心修改：选中底标放大（宽高翻倍，可自定义） */
+        /* 核心修改：底标精准居中于文本下方 */
         .nav-item.active::after {
             content: "";
             position: absolute;
-            bottom: 0;
+            /* 底标在文本正下方 */
+            bottom: -8px; 
             left: 50%;
-            transform: translateX(-50%) scale(10); /* 缩放2倍，底标放大 */
-            width: 30px;  /* 原始尺寸，通过scale放大更清晰 */
+            /* 同时实现水平+垂直居中 */
+            transform: translate(-50%, 0) scale(2); 
+            /* 底标尺寸（根据实际需求调整） */
+            width: 30px;
             height: 10px;
+            /* 底标背景图居中显示 */
             background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/xuanz.png") center center no-repeat;
             background-size: 100% 100%;
-            /* 可选：直接修改宽高放大（二选一）
-            width: 60px;
-            height: 20px;
-            */
+            /* 确保底标不超出文本范围 */
+            box-sizing: border-box;
         }
         /* Logo 容器 */
         .nav-logo {
@@ -132,7 +137,7 @@
         /* 5. 魔法书样式（下移+仅悬浮+无发光） */
         .magic-book-layer {
             position: absolute;
-            top: 45%; /* 从40%改为50%，明显下移 */
+            top: 60%; /* 从40%改为50%，明显下移 */
             left: 50%;
             transform: translate(-50%, -20%);
             z-index: 6;
