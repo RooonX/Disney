@@ -9,7 +9,7 @@
         /* 示例：引入本地/在线字体文件，支持ttf/woff/woff2格式 */
         @font-face {
             font-family: 'GameCustomFont'; /* 自定义字体名称 */
-            src: url('./game-font.ttf') format('truetype'), /* 本地ttf字体 */
+            src: url('raw/refs/heads/main/font/CangErYuYangTiW01-2.ttf') format('truetype'), /* 本地ttf字体 */
                  url('./game-font.woff2') format('woff2'); /* 可选：woff2格式（更小更快） */
             font-weight: normal;
             font-style: normal;
@@ -148,7 +148,7 @@
         /* 6. 预约按钮样式（下移+透明底+hover放大） */
         .btn-layer {
             position: absolute;
-            bottom: 6%; /* 从20%改为12%，下移且远离魔法书 */
+            bottom: 8%; /* 从20%改为12%，下移且远离魔法书 */
             left: 50%;
             transform: translateX(-50%);
             z-index: 7;
