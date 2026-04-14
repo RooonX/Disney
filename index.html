@@ -5,24 +5,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>书境传奇 - 官网首页</title>
     <style>
+        /* 1. 自定义字体引入（替换为你的字体文件路径） */
+        /* 示例：引入本地/在线字体文件，支持ttf/woff/woff2格式 */
+        @font-face {
+            font-family: 'GameCustomFont'; /* 自定义字体名称 */
+            src: url('./game-font.ttf') format('truetype'), /* 本地ttf字体 */
+                 url('./game-font.woff2') format('woff2'); /* 可选：woff2格式（更小更快） */
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap; /* 字体加载时不闪烁 */
+        }
+
         /* 全局重置 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Microsoft Yahei", sans-serif;
+            /* 全局使用自定义字体（可单独给元素设置） */
+            font-family: 'GameCustomFont', "Microsoft Yahei", sans-serif;
         }
 
         /* 页面基础容器（适配浏览器窗口） */
         .page-container {
-            width: 100vw; /* 视口宽度 */
-            height: 100vh; /* 视口高度 */
+            width: 100vw;
+            height: 100vh;
             margin: 0 auto;
             position: relative;
             overflow: hidden;
         }
 
-        /* 1. 背景图样式（适配浏览器） */
+        /* 2. 背景图样式（适配浏览器） */
         .bg-layer {
             width: 100%;
             height: 100%;
@@ -34,21 +46,21 @@
         .bg-img {
             width: 100vw;
             height: 100vh;
-            object-fit: cover; /* 保持比例填充整个视口 */
+            object-fit: cover;
         }
 
-        /* 2. 导航栏样式（置顶+文案层级在上+文案上移） */
+        /* 3. 导航栏样式（置顶+文案上移+hover放大） */
         .nav-bar {
             width: 100%;
             height: 204px;
             position: absolute;
-            top: 0; /* 紧贴顶部 */
+            top: 0;
             left: 0;
-            z-index: 100; /* 确保高于底版背景 */
+            z-index: 100;
             display: flex;
-            align-items: flex-start; /* 关键：垂直靠上对齐，替代原来的center */
+            align-items: flex-start;
             justify-content: center;
-            padding-top: 20px; /* 可调整这个值控制文案上移/下移，数值越小越靠上 */
+            padding-top: 20px;
             background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/top.png") center center no-repeat;
             background-size: 100% 100%;
         }
@@ -64,15 +76,20 @@
             cursor: pointer;
             padding: 10px 20px;
             position: relative;
-            transition: all 0.3s ease;
-            z-index: 101; /* 确保文案在导航底版之上 */
-            /* 可选：如果想更精细调整，可加margin-top负值，比如 margin-top: -10px; */
+            transition: all 0.3s ease; /* 平滑过渡 */
+            z-index: 101;
+            transform-origin: center; /* 放大以中心为原点 */
         }
-        /* 导航选中效果：文字放大+高亮+底标 */
+        /* 导航hover放大效果 */
+        .nav-item:hover {
+            transform: scale(1.1); /* 放大1.1倍，可调整 */
+        }
+        /* 导航选中效果 */
         .nav-item.active {
             font-size: 22px;
             color: #ffd700;
             font-weight: bold;
+            transform: scale(1.1); /* 选中时也保持放大 */
         }
         .nav-item.active::after {
             content: "";
@@ -85,19 +102,19 @@
             background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/xuanz.png") center center no-repeat;
             background-size: 100% 100%;
         }
-        /* Logo 容器（导航中间） */
+        /* Logo 容器 */
         .nav-logo {
             width: 120px;
             height: 80px;
             background: url("./logo.png") center center no-repeat;
             background-size: contain;
-            z-index: 101; /* Logo层级在上 */
+            z-index: 101;
         }
 
-        /* 3. 大标题样式 */
+        /* 4. 大标题样式（调整位置避免重叠） */
         .title-layer {
             position: absolute;
-            top: 20%;
+            top: 18%; /* 轻微上移，给魔法书留出空间 */
             left: 50%;
             transform: translateX(-50%);
             z-index: 5;
@@ -107,32 +124,31 @@
             height: auto;
         }
 
-        /* 4. 魔法书样式（仅保留悬浮，移除发光+粒子效果） */
+        /* 5. 魔法书样式（下移+仅悬浮+无发光） */
         .magic-book-layer {
             position: absolute;
-            top: 40%;
+            top: 50%; /* 从40%改为50%，明显下移 */
             left: 50%;
             transform: translate(-50%, -20%);
             z-index: 6;
-            animation: float 3s ease-in-out infinite; /* 仅保留悬浮动画 */
+            animation: float 3s ease-in-out infinite;
         }
         .magic-book {
             width: 300px;
             height: auto;
-            /* 移除发光特效 */
             position: relative;
         }
-        /* 悬浮动画（保留） */
+        /* 悬浮动画 */
         @keyframes float {
             0% { transform: translate(-50%, -20%); }
             50% { transform: translate(-50%, -15%); }
             100% { transform: translate(-50%, -20%); }
         }
 
-        /* 5. 预约按钮样式（透明底） */
+        /* 6. 预约按钮样式（下移+透明底+hover放大） */
         .btn-layer {
             position: absolute;
-            bottom: 20%;
+            bottom: 12%; /* 从20%改为12%，下移且远离魔法书 */
             left: 50%;
             transform: translateX(-50%);
             z-index: 7;
@@ -145,20 +161,26 @@
             background-size: 100% 100%;
             background-repeat: no-repeat;
             font-size: 0;
-            background-color: transparent; /* 强制透明背景，解决白底问题 */
-            outline: none; /* 移除默认轮廓 */
+            background-color: transparent;
+            outline: none;
+            transition: all 0.3s ease; /* 平滑过渡 */
+            transform-origin: center;
         }
-        /* 成为管理员按钮（默认状态） */
+        /* 按钮hover放大效果 */
+        .reserve-btn:hover {
+            transform: scale(1.08); /* 按钮放大1.08倍，更柔和 */
+        }
+        /* 成为管理员按钮 */
         .btn-admin {
             background-image: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bottom-1.png");
         }
-        /* 预约成功按钮（切换状态） */
+        /* 预约成功按钮 */
         .btn-success {
             background-image: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bottom-2.png");
             display: none;
         }
 
-        /* 6. 弹窗样式（含黑色遮罩，移除按钮） */
+        /* 7. 弹窗样式（点击空白关闭+无按钮） */
         .modal-mask {
             position: fixed;
             top: 0;
@@ -170,6 +192,7 @@
             display: none;
             justify-content: center;
             align-items: center;
+            cursor: pointer; /* 空白处显示点击光标 */
         }
         .modal-content {
             width: 600px;
@@ -177,10 +200,7 @@
             background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/tanchuang.png") center center no-repeat;
             background-size: 100% 100%;
             position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end;
-            padding-bottom: 120px;
+            cursor: default; /* 弹窗内容区恢复默认光标 */
         }
         /* 移除弹窗按钮容器 */
         .modal-btns {
@@ -190,41 +210,41 @@
 </head>
 <body>
     <div class="page-container">
-        <!-- 1. 背景图 -->
+        <!-- 背景图 -->
         <div class="bg-layer">
             <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bg_1.png" alt="背景图" class="bg-img">
         </div>
 
-        <!-- 2. 导航栏 -->
+        <!-- 导航栏 -->
         <div class="nav-bar">
             <div class="nav-items">
                 <div class="nav-item active">官网首页</div>
                 <div class="nav-item">魔法小镇</div>
-                <div class="nav-logo"></div> <!-- Logo 中间位置 -->
+                <div class="nav-logo"></div>
                 <div class="nav-item">游戏特色</div>
                 <div class="nav-item">小镇简报</div>
             </div>
         </div>
 
-        <!-- 3. 大标题 -->
+        <!-- 大标题 -->
         <div class="title-layer">
             <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/slogan.png" alt="大标题" class="title-img">
         </div>
 
-        <!-- 4. 魔法书（移除粒子光效元素） -->
+        <!-- 魔法书 -->
         <div class="magic-book-layer">
             <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/book.png" alt="魔法书" class="magic-book">
         </div>
 
-        <!-- 5. 预约按钮 -->
+        <!-- 预约按钮 -->
         <div class="btn-layer">
             <button class="reserve-btn btn-admin" id="adminBtn">成为管理员</button>
             <button class="reserve-btn btn-success" id="successBtn">预约成功</button>
         </div>
 
-        <!-- 6. 弹窗（含遮罩，已移除按钮） -->
+        <!-- 弹窗 -->
         <div class="modal-mask" id="modalMask">
-            <div class="modal-content">
+            <div class="modal-content" id="modalContent">
                 <div class="modal-btns">
                     <button class="modal-btn" id="groupBtn">加入官群</button>
                     <button class="modal-btn" id="returnBtn">确认返回</button>
@@ -238,15 +258,14 @@
         const adminBtn = document.getElementById('adminBtn');
         const successBtn = document.getElementById('successBtn');
         const modalMask = document.getElementById('modalMask');
+        const modalContent = document.getElementById('modalContent');
         const returnBtn = document.getElementById('returnBtn');
         const navItems = document.querySelectorAll('.nav-item');
 
         // 1. 导航栏选中效果
         navItems.forEach(item => {
             item.addEventListener('click', () => {
-                // 移除所有选中状态
                 navItems.forEach(nav => nav.classList.remove('active'));
-                // 添加当前选中状态
                 item.classList.add('active');
             });
         });
@@ -256,14 +275,24 @@
             modalMask.style.display = 'flex';
         });
 
-        // 3. 点击「确认返回」关闭弹窗，切换按钮状态
+        // 3. 弹窗点击空白处关闭（点击遮罩层关闭，点击内容区不关闭）
+        modalMask.addEventListener('click', (e) => {
+            if (e.target === modalMask) {
+                modalMask.style.display = 'none';
+                // 关闭弹窗后切换按钮状态
+                adminBtn.style.display = 'none';
+                successBtn.style.display = 'block';
+            }
+        });
+
+        // 4. 兼容原来的确认返回按钮（保留，防止影响逻辑）
         returnBtn.addEventListener('click', () => {
             modalMask.style.display = 'none';
             adminBtn.style.display = 'none';
             successBtn.style.display = 'block';
         });
 
-        // 4. 「加入官群」按钮点击事件（可扩展跳转逻辑）
+        // 5. 加入官群按钮（保留扩展能力）
         document.getElementById('groupBtn').addEventListener('click', () => {
             alert('已跳转至官群页面！');
         });
