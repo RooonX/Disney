@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>书境传奇 - 官网首页</title>
+    <title>书境传奇 - 官网</title>
     <style>
-        /* 1. 自定义字体引入（替换为你的字体文件路径） */
+        /* ========== 全局样式（复用第一页+通用配置） ========== */
         @font-face {
-            font-family: 'GameCustomFont'; /* 自定义字体名称 */
+            font-family: 'GameCustomFont';
             src: url('font/CangErYuYangTiW01-2.ttf') format('truetype'),
                  url('./game-font.woff2') format('woff2');
             font-weight: normal;
@@ -15,52 +15,49 @@
             font-display: swap;
         }
 
-        /* 全局重置 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'GameCustomFont', "Microsoft Yahei", sans-serif;
+            scroll-behavior: smooth; /* 平滑滚动 */
         }
 
-        /* 页面基础容器（适配浏览器窗口） */
-        .page-container {
+        body {
+            overflow: hidden; /* 隐藏全局滚动条，通过JS控制页面切换 */
+        }
+
+        /* 页面容器：包含所有分页，高度为页面总数×100vh */
+        .pages-container {
+            width: 100vw;
+            height: 400vh; /* 预留4页空间（首页+魔法小镇+游戏特色+小镇简报） */
+            position: relative;
+            transition: transform 0.8s ease; /* 切页平滑过渡 */
+        }
+
+        /* 单页通用样式：1920x1080适配，100vw/100vh */
+        .page {
             width: 100vw;
             height: 100vh;
-            margin: 0 auto;
             position: relative;
             overflow: hidden;
         }
 
-        /* 2. 背景图样式（适配浏览器） */
-        .bg-layer {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
-        }
-        .bg-img {
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-        }
-
-        /* 3. 导航栏样式（置顶+文案上移+hover放大） */
+        /* ========== 导航栏（全局置顶，复用第一页样式） ========== */
         .nav-bar {
             width: 100%;
             height: 204px;
-            position: absolute;
+            position: fixed; /* 全局置顶，不随页面滚动 */
             top: 0;
             left: 0;
-            z-index: 100;
+            z-index: 999; /* 最高层级，确保不被遮挡 */
             display: flex;
             align-items: flex-start;
             justify-content: center;
             padding-top: 20px;
             background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/top.png") center center no-repeat;
             background-size: 100% 100%;
+            pointer-events: auto; /* 确保导航可点击 */
         }
         .nav-items {
             width: 1000px;
@@ -68,112 +65,111 @@
             justify-content: space-between;
             align-items: center;
         }
-        /* 核心修改1：重构nav-item层级 - 文本单独分层 */
         .nav-item {
             color: #ffdd98;
             font-size: 18px;
             cursor: pointer;
             padding: 10px 20px;
-            position: relative; /* 作为子元素的定位容器 */
+            position: relative;
             transition: all 0.3s ease;
-            z-index: 150; 
+            z-index: 1;
             transform-origin: center;
             height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        /* 新增：文本层 - 单独控制层级，确保高于底标 */
         .nav-item .nav-text {
-            position: relative; /* 开启z-index生效 */
-            z-index: 2; /* 文本层级 > 底标层级(1) */
+            position: relative;
+            z-index: 2;
         }
-        /* 核心修改2：底标放大+向右偏移（关键调整） */
         .nav-item::after {
             content: "";
             position: absolute;
             bottom: -12px;
-            /* 向右偏移：left从50%改为50% +  translateX增加20px（可调整） */
             left: 50%;
-            /* scale(1.5) 放大1.5倍 | translateX(-50% + 20px) 向右偏移20px */
-            transform: translateX(calc(-50% + 7px)) scale(1.5); 
-            /* 底标基础尺寸放大（配合scale更明显） */
+            transform: translateX(calc(-50% + 7px)) scale(1.5);
             width: 180px;
             height: 75px;
             background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/xuanz.png") center center no-repeat;
             background-size: 100% 100%;
-            box-sizing: border-box;
-            z-index: 1; /* 明确低于文本层(z-index:2) */
-            opacity: 0; /* 默认隐藏 */
-            pointer-events: none; /* 底标不响应点击，不影响文本交互 */
+            z-index: 1;
+            opacity: 0;
+            pointer-events: none;
         }
-        /* 选中时显示底标 */
         .nav-item.active::after {
-            opacity: 1; /* 显示底标 */
+            opacity: 1;
         }
-        /* 导航hover放大效果（仅放大文本层，底标位置不变） */
         .nav-item:hover .nav-text {
             transform: scale(1.1);
         }
-        /* 导航选中效果（仅修改文本层样式） */
         .nav-item.active .nav-text {
             font-size: 22px;
             color: #ffffff;
             font-weight: bold;
             transform: scale(1.1);
         }
-        /* Logo 容器 */
         .nav-logo {
             width: 120px;
             height: 80px;
             background: url("./logo.png") center center no-repeat;
             background-size: contain;
-            z-index: 101; /* Logo层级与文本一致 */
+            z-index: 2;
         }
 
-        /* 4. 大标题样式（调整位置避免重叠） */
-        .title-layer {
+        /* ========== 第一页：官网首页（复用原有样式） ========== */
+        .page-1 .bg-layer {
+            width: 100%;
+            height: 100%;
             position: absolute;
-            top: 18%; /* 轻微上移，给魔法书留出空间 */
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        .page-1 .bg-img {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            /* 背景图可替换：替换下面的url为本地路径即可 */
+            content: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bg_1.png");
+        }
+        .page-1 .title-layer {
+            position: absolute;
+            top: 18%;
             left: 50%;
             transform: translateX(-50%);
             z-index: 5;
         }
-        .title-img {
+        .page-1 .title-img {
             width: 800px;
             height: auto;
         }
-
-        /* 5. 魔法书样式（下移+仅悬浮+无发光） */
-        .magic-book-layer {
+        .page-1 .magic-book-layer {
             position: absolute;
-            top: 45%; /* 从40%改为50%，明显下移 */
+            top: 45%;
             left: 50%;
             transform: translate(-50%, -20%);
             z-index: 6;
             animation: float 3s ease-in-out infinite;
         }
-        .magic-book {
+        .page-1 .magic-book {
             width: 300px;
             height: auto;
             position: relative;
         }
-        /* 悬浮动画 */
         @keyframes float {
             0% { transform: translate(-50%, -20%); }
             50% { transform: translate(-50%, -15%); }
             100% { transform: translate(-50%, -20%); }
         }
-
-        /* 6. 预约按钮样式（下移+透明底+hover放大） */
-        .btn-layer {
+        .page-1 .btn-layer {
             position: absolute;
-            bottom: 8%; /* 从20%改为12%，下移且远离魔法书 */
+            bottom: 8%;
             left: 50%;
             transform: translateX(-50%);
             z-index: 7;
         }
-        .reserve-btn {
+        .page-1 .reserve-btn {
             width: 300px;
             height: 80px;
             border: none;
@@ -183,140 +179,365 @@
             font-size: 0;
             background-color: transparent;
             outline: none;
-            transition: all 0.3s ease; /* 平滑过渡 */
+            transition: all 0.3s ease;
             transform-origin: center;
         }
-        /* 按钮hover放大效果 */
-        .reserve-btn:hover {
-            transform: scale(1.08); /* 按钮放大1.08倍，更柔和 */
+        .page-1 .reserve-btn:hover {
+            transform: scale(1.08);
         }
-        /* 成为管理员按钮 */
-        .btn-admin {
+        .page-1 .btn-admin {
             background-image: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bottom-1.png");
         }
-        /* 预约成功按钮 */
-        .btn-success {
+        .page-1 .btn-success {
             background-image: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bottom-2.png");
             display: none;
         }
-
-        /* 7. 弹窗样式（点击空白关闭+无按钮） */
-        .modal-mask {
+        .page-1 .modal-mask {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 200;
+            z-index: 2000;
             display: none;
             justify-content: center;
             align-items: center;
-            cursor: pointer; /* 空白处显示点击光标 */
+            cursor: pointer;
         }
-        .modal-content {
+        .page-1 .modal-content {
             width: 600px;
             height: 700px;
             background: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/tanchuang.png") center center no-repeat;
             background-size: 100% 100%;
             position: relative;
-            cursor: default; /* 弹窗内容区恢复默认光标 */
+            cursor: default;
         }
-        /* 移除弹窗按钮容器 */
-        .modal-btns {
+        .page-1 .modal-btns {
             display: none;
+        }
+
+        /* ========== 第二页：魔法小镇（核心新样式） ========== */
+        /* 背景图：可替换，复用第一页背景图逻辑 */
+        .page-2 .bg-layer {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+        .page-2 .bg-img {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            /* 背景图可替换：替换下面的url为本地路径即可 */
+            content: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bg_1.png");
+        }
+
+        /* 小标题：659x199px，可替换，位置在大插图上方居中 */
+        .page-2 .subtitle-layer {
+            position: absolute;
+            top: 20%; /* 大插图上方位置，可微调 */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            width: 659px;
+            height: 199px;
+        }
+        .page-2 .subtitle-img {
+            width: 100%;
+            height: 100%;
+            /* 小标题可替换：替换下面的url为本地路径即可 */
+            content: url("./subtitle-magic-town.png");
+        }
+
+        /* 大插图：975x677px，hover放大，居中显示 */
+        .page-2 .big-illustration-layer {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            width: 975px;
+            height: 677px;
+            transition: transform 0.3s ease; /* hover放大过渡 */
+        }
+        .page-2 .big-illustration-img {
+            width: 100%;
+            height: 100%;
+            /* 大插图可替换：替换下面的url为本地路径即可 */
+            content: url("./big-illustration-magic-town.png");
+        }
+        /* 大插图hover放大 */
+        .page-2 .big-illustration-layer:hover {
+            transform: translate(-50%, -50%) scale(1.05); /* 放大1.05倍，可调整 */
+        }
+
+        /* 预约奖励容器：进度条+图标+人数，居中在大插图下方 */
+        .page-2 .reward-container {
+            position: absolute;
+            bottom: 10%; /* 底部位置，可微调 */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            width: 1200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 奖励进度条：可控制百分比，与图标上下居中 */
+        .page-2 .reward-progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #222;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        .page-2 .progress-fill {
+            /* 进度百分比：修改width即可控制（如80%=80%） */
+            width: 70%; 
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ff9900);
+            border-radius: 10px;
+            transition: width 0.5s ease; /* 进度变化过渡 */
+        }
+
+        /* 奖励图标容器：8个图标按布局排列 */
+        .page-2 .reward-icons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        .page-2 .reward-icon {
+            width: 70px;
+            height: 70px;
+            transition: transform 0.3s ease; /* hover放大过渡 */
+        }
+        .page-2 .reward-icon img {
+            width: 100%;
+            height: 100%;
+            /* 奖励图标可替换：替换下面的url为本地路径，共8个依次修改 */
+            content: url("./reward-icon-1.png");
+        }
+        /* 奖励图标hover放大 */
+        .page-2 .reward-icon:hover {
+            transform: scale(1.15); /* 放大1.15倍，可调整 */
+        }
+        /* 单独替换不同奖励图标（示例：第2个图标） */
+        .page-2 .reward-icon:nth-child(2) img {
+            content: url("./reward-icon-2.png");
+        }
+        .page-2 .reward-icon:nth-child(3) img {
+            content: url("./reward-icon-3.png");
+        }
+        .page-2 .reward-icon:nth-child(4) img {
+            content: url("./reward-icon-4.png");
+        }
+        .page-2 .reward-icon:nth-child(5) img {
+            content: url("./reward-icon-5.png");
+        }
+        .page-2 .reward-icon:nth-child(6) img {
+            content: url("./reward-icon-6.png");
+        }
+        .page-2 .reward-icon:nth-child(7) img {
+            content: url("./reward-icon-7.png");
+        }
+        .page-2 .reward-icon:nth-child(8) img {
+            content: url("./reward-icon-8.png");
+        }
+
+        /* 预约人数容器：3个人数图片对应三组奖励 */
+        .page-2 .reserve-counts {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            padding: 0 20px;
+        }
+        .page-2 .reserve-count {
+            width: 185px;
+            height: 99px;
+        }
+        .page-2 .reserve-count img {
+            width: 100%;
+            height: 100%;
+            /* 预约人数可替换：替换下面的url为本地路径，共3个依次修改 */
+            content: url("./count-50w.png");
+        }
+        .page-2 .reserve-count:nth-child(2) img {
+            content: url("./count-100w.png");
+        }
+        .page-2 .reserve-count:nth-child(3) img {
+            content: url("./count-300w.png");
         }
     </style>
 </head>
 <body>
-    <div class="page-container">
-        <!-- 背景图 -->
-        <div class="bg-layer">
-            <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bg_1.png" alt="背景图" class="bg-img">
-        </div>
-
-        <!-- 导航栏 -->
-        <div class="nav-bar">
-            <div class="nav-items">
-                <!-- 核心修改3：给导航文本包裹span层 -->
-                <div class="nav-item active"><span class="nav-text">官网首页</span></div>
-                <div class="nav-item"><span class="nav-text">魔法小镇</span></div>
-                <div class="nav-logo"></div>
-                <div class="nav-item"><span class="nav-text">游戏特色</span></div>
-                <div class="nav-item"><span class="nav-text">小镇简报</span></div>
-            </div>
-        </div>
-
-        <!-- 大标题 -->
-        <div class="title-layer">
-            <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/slogan.png" alt="大标题" class="title-img">
-        </div>
-
-        <!-- 魔法书 -->
-        <div class="magic-book-layer">
-            <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/book.png" alt="魔法书" class="magic-book">
-        </div>
-
-        <!-- 预约按钮 -->
-        <div class="btn-layer">
-            <button class="reserve-btn btn-admin" id="adminBtn">成为管理员</button>
-            <button class="reserve-btn btn-success" id="successBtn">预约成功</button>
-        </div>
-
-        <!-- 弹窗 -->
-        <div class="modal-mask" id="modalMask">
-            <div class="modal-content" id="modalContent">
-                <div class="modal-btns">
-                    <button class="modal-btn" id="groupBtn">加入官群</button>
-                    <button class="modal-btn" id="returnBtn">确认返回</button>
-                </div>
-            </div>
+    <!-- 导航栏（全局） -->
+    <div class="nav-bar">
+        <div class="nav-items">
+            <div class="nav-item active" data-page="1"><span class="nav-text">官网首页</span></div>
+            <div class="nav-item" data-page="2"><span class="nav-text">魔法小镇</span></div>
+            <div class="nav-logo"></div>
+            <div class="nav-item" data-page="3"><span class="nav-text">游戏特色</span></div>
+            <div class="nav-item" data-page="4"><span class="nav-text">小镇简报</span></div>
         </div>
     </div>
 
-    <script>
-        // 获取DOM元素
-        const adminBtn = document.getElementById('adminBtn');
-        const successBtn = document.getElementById('successBtn');
-        const modalMask = document.getElementById('modalMask');
-        const modalContent = document.getElementById('modalContent');
-        const returnBtn = document.getElementById('returnBtn');
-        const navItems = document.querySelectorAll('.nav-item');
+    <!-- 所有页面容器（通过transform切换页面） -->
+    <div class="pages-container" id="pagesContainer">
+        <!-- 第一页：官网首页 -->
+        <div class="page page-1">
+            <div class="bg-layer">
+                <img class="bg-img" alt="首页背景">
+            </div>
+            <div class="title-layer">
+                <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/slogan.png" alt="大标题" class="title-img">
+            </div>
+            <div class="magic-book-layer">
+                <img src="https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/book.png" alt="魔法书" class="magic-book">
+            </div>
+            <div class="btn-layer">
+                <button class="reserve-btn btn-admin" id="adminBtn">成为管理员</button>
+                <button class="reserve-btn btn-success" id="successBtn">预约成功</button>
+            </div>
+            <div class="modal-mask" id="modalMask">
+                <div class="modal-content" id="modalContent">
+                    <div class="modal-btns">
+                        <button class="modal-btn" id="groupBtn">加入官群</button>
+                        <button class="modal-btn" id="returnBtn">确认返回</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        // 1. 导航栏选中效果
+        <!-- 第二页：魔法小镇 -->
+        <div class="page page-2">
+            <div class="bg-layer">
+                <img class="bg-img" alt="魔法小镇背景">
+            </div>
+            <!-- 小标题 -->
+            <div class="subtitle-layer">
+                <img class="subtitle-img" alt="魔法小镇小标题">
+            </div>
+            <!-- 大插图 -->
+            <div class="big-illustration-layer">
+                <img class="big-illustration-img" alt="魔法小镇大插图">
+            </div>
+            <!-- 预约奖励容器（进度条+图标+人数） -->
+            <div class="reward-container">
+                <!-- 奖励进度条 -->
+                <div class="reward-progress-bar">
+                    <div class="progress-fill"></div>
+                </div>
+                <!-- 奖励图标（8个） -->
+                <div class="reward-icons">
+                    <div class="reward-icon"><img alt="奖励1"></div>
+                    <div class="reward-icon"><img alt="奖励2"></div>
+                    <div class="reward-icon"><img alt="奖励3"></div>
+                    <div class="reward-icon"><img alt="奖励4"></div>
+                    <div class="reward-icon"><img alt="奖励5"></div>
+                    <div class="reward-icon"><img alt="奖励6"></div>
+                    <div class="reward-icon"><img alt="奖励7"></div>
+                    <div class="reward-icon"><img alt="奖励8"></div>
+                </div>
+                <!-- 预约人数（3个） -->
+                <div class="reserve-counts">
+                    <div class="reserve-count"><img alt="50万预约"></div>
+                    <div class="reserve-count"><img alt="100万预约"></div>
+                    <div class="reserve-count"><img alt="300万预约"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 预留第三页：游戏特色（空容器，后续补充） -->
+        <div class="page page-3"></div>
+        <!-- 预留第四页：小镇简报（空容器，后续补充） -->
+        <div class="page page-4"></div>
+    </div>
+
+    <script>
+        // ========== 核心变量 ==========
+        const pagesContainer = document.getElementById('pagesContainer');
+        const navItems = document.querySelectorAll('.nav-item');
+        let currentPage = 1; // 当前页码（默认首页）
+        const totalPages = 4; // 总页数（4页）
+
+        // ========== 导航点击切页 ==========
         navItems.forEach(item => {
             item.addEventListener('click', () => {
-                navItems.forEach(nav => nav.classList.remove('active'));
-                item.classList.add('active');
+                // 获取目标页码
+                const targetPage = parseInt(item.dataset.page);
+                if (targetPage && targetPage !== currentPage) {
+                    switchPage(targetPage);
+                }
             });
         });
 
-        // 2. 点击「成为管理员」弹出弹窗
+        // ========== 滚轮切页 ==========
+        document.addEventListener('wheel', (e) => {
+            // 滚轮向上：页码-1；向下：页码+1
+            const direction = e.deltaY > 0 ? 1 : -1;
+            const targetPage = currentPage + direction;
+            // 限制页码在1~totalPages之间
+            if (targetPage >= 1 && targetPage <= totalPages) {
+                switchPage(targetPage);
+            }
+        });
+
+        // ========== 切页核心函数 ==========
+        function switchPage(targetPage) {
+            // 1. 更新当前页码
+            currentPage = targetPage;
+            // 2. 滚动到目标页面（transform偏移：- (targetPage-1)*100vh）
+            pagesContainer.style.transform = `translateY(-${(targetPage - 1) * 100}vh)`;
+            // 3. 更新导航active状态
+            navItems.forEach(item => {
+                if (parseInt(item.dataset.page) === targetPage) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        // ========== 第一页弹窗逻辑（复用原有逻辑） ==========
+        const adminBtn = document.getElementById('adminBtn');
+        const successBtn = document.getElementById('successBtn');
+        const modalMask = document.getElementById('modalMask');
+        const returnBtn = document.getElementById('returnBtn');
+        const groupBtn = document.getElementById('groupBtn');
+
         adminBtn.addEventListener('click', () => {
             modalMask.style.display = 'flex';
         });
 
-        // 3. 弹窗点击空白处关闭（点击遮罩层关闭，点击内容区不关闭）
         modalMask.addEventListener('click', (e) => {
             if (e.target === modalMask) {
                 modalMask.style.display = 'none';
-                // 关闭弹窗后切换按钮状态
                 adminBtn.style.display = 'none';
                 successBtn.style.display = 'block';
             }
         });
 
-        // 4. 兼容原来的确认返回按钮（保留，防止影响逻辑）
         returnBtn.addEventListener('click', () => {
             modalMask.style.display = 'none';
             adminBtn.style.display = 'none';
             successBtn.style.display = 'block';
         });
 
-        // 5. 加入官群按钮（保留扩展能力）
-        document.getElementById('groupBtn').addEventListener('click', () => {
+        groupBtn.addEventListener('click', () => {
             alert('已跳转至官群页面！');
         });
+
+        // ========== 进度条控制（可选：动态修改进度） ==========
+        // 示例：修改进度为80%
+        // document.querySelector('.progress-fill').style.width = '80%';
     </script>
 </body>
 </html>
