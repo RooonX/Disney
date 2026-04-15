@@ -25,6 +25,7 @@
 
         body {
             overflow: hidden; /* 隐藏全局滚动条，通过JS控制页面切换 */
+            background-color: #000; /* 兜底背景，避免第一页加载失败时空白 */
         }
 
         /* 页面容器：包含所有分页，高度为页面总数×100vh */
@@ -117,7 +118,7 @@
             z-index: 2;
         }
 
-        /* ========== 第一页：官网首页（复用原有样式） ========== */
+        /* ========== 第一页：官网首页（修复显示问题） ========== */
         .page-1 .bg-layer {
             width: 100%;
             height: 100%;
@@ -130,8 +131,21 @@
             width: 100vw;
             height: 100vh;
             object-fit: cover;
-            /* 背景图可替换：替换下面的url为本地路径即可 */
+            /* 修复：增加本地兜底路径，避免远程地址失效 */
             content: url("https://raw.githubusercontent.com/RooonX/Disney/refs/heads/main/images/01/bg_1.png");
+            /* 加载失败兜底 */
+            background-color: #1a1a1a;
+            display: block; /* 确保img元素渲染 */
+        }
+        /* 图片加载失败样式兜底 */
+        .page-1 .bg-img::after {
+            content: "首页背景";
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
         }
         .page-1 .title-layer {
             position: absolute;
@@ -139,10 +153,13 @@
             left: 50%;
             transform: translateX(-50%);
             z-index: 5;
+            /* 修复：增加最小宽度，避免缩放消失 */
+            min-width: 600px;
         }
         .page-1 .title-img {
             width: 800px;
             height: auto;
+            display: block; /* 确保渲染 */
         }
         .page-1 .magic-book-layer {
             position: absolute;
@@ -156,6 +173,7 @@
             width: 300px;
             height: auto;
             position: relative;
+            display: block; /* 确保渲染 */
         }
         @keyframes float {
             0% { transform: translate(-50%, -20%); }
@@ -181,6 +199,7 @@
             outline: none;
             transition: all 0.3s ease;
             transform-origin: center;
+            display: block; /* 确保渲染 */
         }
         .page-1 .reserve-btn:hover {
             transform: scale(1.08);
@@ -217,7 +236,7 @@
             display: none;
         }
 
-        /* ========== 第二页：魔法小镇（核心新样式） ========== */
+        /* ========== 第二页：魔法小镇（核心调整） ========== */
         /* 背景图：可替换，复用第一页背景图逻辑 */
         .page-2 .bg-layer {
             width: 100%;
@@ -231,14 +250,16 @@
             width: 100vw;
             height: 100vh;
             object-fit: cover;
-            /* 背景图可替换：替换下面的url为本地路径即可 */
             content: url("images/02/bg_2.png");
+            /* 加载失败兜底 */
+            background-color: #1a1a1a;
+            display: block;
         }
 
-        /* 小标题：659x199px，可替换，位置在大插图上方居中 */
+        /* 小标题：上移，避免被插画遮挡 */
         .page-2 .subtitle-layer {
             position: absolute;
-            top: 20%; /* 大插图上方位置，可微调 */
+            top: 15%; /* 从20%调小，上移标题 */
             left: 50%;
             transform: translateX(-50%);
             z-index: 2;
@@ -248,14 +269,14 @@
         .page-2 .subtitle-img {
             width: 100%;
             height: 100%;
-            /* 小标题可替换：替换下面的url为本地路径即可 */
             content: url("images/02/title_1.png");
+            display: block;
         }
 
-        /* 大插图：975x677px，hover放大，居中显示 */
+        /* 大插图：下移，避免遮挡小标题 */
         .page-2 .big-illustration-layer {
             position: absolute;
-            top: 50%;
+            top: 55%; /* 从50%调大，整体下移 */
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 2;
@@ -266,18 +287,18 @@
         .page-2 .big-illustration-img {
             width: 100%;
             height: 100%;
-            /* 大插图可替换：替换下面的url为本地路径即可 */
             content: url("images/02/town.png");
+            display: block;
         }
         /* 大插图hover放大 */
         .page-2 .big-illustration-layer:hover {
             transform: translate(-50%, -50%) scale(1.05); /* 放大1.05倍，可调整 */
         }
 
-        /* 预约奖励容器：进度条+图标+人数，居中在大插图下方 */
+        /* 预约奖励容器：整体下移，进度条移至底部 */
         .page-2 .reward-container {
             position: absolute;
-            bottom: 10%; /* 底部位置，可微调 */
+            bottom: 5%; /* 从10%调小，下移奖励模块 */
             left: 50%;
             transform: translateX(-50%);
             z-index: 3;
@@ -287,77 +308,72 @@
             align-items: center;
         }
 
-        /* 奖励进度条：可控制百分比，与图标上下居中 */
+        /* 奖励进度条：调扁（高度10px）、移至底部 */
         .page-2 .reward-progress-bar {
             width: 100%;
-            height: 20px;
+            height: 10px; /* 从20px调小，更扁 */
             background-color: #222;
-            border-radius: 10px;
+            border-radius: 8px; /* 适配高度调整圆角 */
             overflow: hidden;
-            margin-bottom: 10px;
+            margin-top: 10px; /* 从margin-bottom改为margin-top，移至底部 */
         }
         .page-2 .progress-fill {
-            /* 进度百分比：修改width即可控制（如80%=80%） */
             width: 70%; 
             height: 100%;
             background: linear-gradient(90deg, #ffd700, #ff9900);
-            border-radius: 10px;
-            transition: width 0.5s ease; /* 进度变化过渡 */
+            border-radius: 8px;
+            transition: width 0.5s ease;
         }
 
-        /* 奖励图标容器：8个图标按布局排列 */
+        /* 奖励图标容器：分组紧靠（1-2/3-4-5/6-7-8） */
         .page-2 .reward-icons {
             display: flex;
-            justify-content: space-between;
+            justify-content: space-between; /* 分组间拉大间距，组内紧靠 */
             align-items: center;
             width: 100%;
             margin-bottom: 5px;
+            gap: 10px; /* 兜底间距 */
+        }
+        /* 分组容器：组内无间距，组间自动分配空间 */
+        .page-2 .icon-group {
+            display: flex;
+            justify-content: center;
+            gap: 5px; /* 组内图标微小间距 */
+            flex: 1; /* 三组均分宽度 */
         }
         .page-2 .reward-icon {
             width: 70px;
             height: 70px;
-            transition: transform 0.3s ease; /* hover放大过渡 */
+            transition: transform 0.3s ease;
+            flex-shrink: 0; /* 避免组内图标压缩 */
         }
         .page-2 .reward-icon img {
             width: 100%;
             height: 100%;
-            /* 奖励图标可替换：替换下面的url为本地路径，共8个依次修改 */
             content: url("images/02/gift_1.png");
+            display: block;
         }
         /* 奖励图标hover放大 */
         .page-2 .reward-icon:hover {
-            transform: scale(1.15); /* 放大1.15倍，可调整 */
+            transform: scale(1.15);
         }
-        /* 单独替换不同奖励图标（示例：第2个图标） */
-        .page-2 .reward-icon:nth-child(2) img {
-            content: url("images/02/gift_2.png");
-        }
-        .page-2 .reward-icon:nth-child(3) img {
-            content: url("images/02/gift_3.png");
-        }
-        .page-2 .reward-icon:nth-child(4) img {
-            content: url("images/02/gift_4.png");
-        }
-        .page-2 .reward-icon:nth-child(5) img {
-            content: url("images/02/gift_5.png");
-        }
-        .page-2 .reward-icon:nth-child(6) img {
-            content: url("images/02/gift_6.png");
-        }
-        .page-2 .reward-icon:nth-child(7) img {
-            content: url("images/02/gift_7.png");
-        }
-        .page-2 .reward-icon:nth-child(8) img {
-            content: url("images/02/gift_8.png");
-        }
+        /* 单独替换不同奖励图标 */
+        .page-2 .reward-icon:nth-child(2) img { content: url("images/02/gift_2.png"); }
+        .page-2 .reward-icon:nth-child(3) img { content: url("images/02/gift_3.png"); }
+        .page-2 .reward-icon:nth-child(4) img { content: url("images/02/gift_4.png"); }
+        .page-2 .reward-icon:nth-child(5) img { content: url("images/02/gift_5.png"); }
+        .page-2 .reward-icon:nth-child(6) img { content: url("images/02/gift_6.png"); }
+        .page-2 .reward-icon:nth-child(7) img { content: url("images/02/gift_7.png"); }
+        .page-2 .reward-icon:nth-child(8) img { content: url("images/02/gift_8.png"); }
 
-        /* 预约人数容器：3个人数图片对应三组奖励 */
+        /* 预约人数容器 */
         .page-2 .reserve-counts {
             display: flex;
             justify-content: space-between;
             align-items: center;
             width: 100%;
             padding: 0 20px;
+            margin-bottom: 10px; /* 给进度条留出空间 */
         }
         .page-2 .reserve-count {
             width: 185px;
@@ -366,15 +382,11 @@
         .page-2 .reserve-count img {
             width: 100%;
             height: 100%;
-            /* 预约人数可替换：替换下面的url为本地路径，共3个依次修改 */
             content: url("images/02/50-yuyue.png");
+            display: block;
         }
-        .page-2 .reserve-count:nth-child(2) img {
-            content: url("images/02/100-yuyue.png");
-        }
-        .page-2 .reserve-count:nth-child(3) img {
-            content: url("images/02/300-yuyue.png");
-        }
+        .page-2 .reserve-count:nth-child(2) img { content: url("images/02/100-yuyue.png"); }
+        .page-2 .reserve-count:nth-child(3) img { content: url("images/02/300-yuyue.png"); }
     </style>
 </head>
 <body>
@@ -416,7 +428,7 @@
             </div>
         </div>
 
-        <!-- 第二页：魔法小镇 -->
+        <!-- 第二页：魔法小镇（调整DOM结构适配分组/进度条） -->
         <div class="page page-2">
             <div class="bg-layer">
                 <img class="bg-img" alt="魔法小镇背景">
@@ -425,32 +437,41 @@
             <div class="subtitle-layer">
                 <img class="subtitle-img" alt="魔法小镇小标题">
             </div>
-            <!-- 大插图 -->
+            <!-- 大插图（下移） -->
             <div class="big-illustration-layer">
                 <img class="big-illustration-img" alt="魔法小镇大插图">
             </div>
-            <!-- 预约奖励容器（进度条+图标+人数） -->
+            <!-- 预约奖励容器（进度条移至底部） -->
             <div class="reward-container">
-                <!-- 奖励进度条 -->
-                <div class="reward-progress-bar">
-                    <div class="progress-fill"></div>
-                </div>
-                <!-- 奖励图标（8个） -->
+                <!-- 奖励图标（分组） -->
                 <div class="reward-icons">
-                    <div class="reward-icon"><img alt="奖励1"></div>
-                    <div class="reward-icon"><img alt="奖励2"></div>
-                    <div class="reward-icon"><img alt="奖励3"></div>
-                    <div class="reward-icon"><img alt="奖励4"></div>
-                    <div class="reward-icon"><img alt="奖励5"></div>
-                    <div class="reward-icon"><img alt="奖励6"></div>
-                    <div class="reward-icon"><img alt="奖励7"></div>
-                    <div class="reward-icon"><img alt="奖励8"></div>
+                    <!-- 第一组：1-2 -->
+                    <div class="icon-group">
+                        <div class="reward-icon"><img alt="奖励1"></div>
+                        <div class="reward-icon"><img alt="奖励2"></div>
+                    </div>
+                    <!-- 第二组：3-4-5 -->
+                    <div class="icon-group">
+                        <div class="reward-icon"><img alt="奖励3"></div>
+                        <div class="reward-icon"><img alt="奖励4"></div>
+                        <div class="reward-icon"><img alt="奖励5"></div>
+                    </div>
+                    <!-- 第三组：6-7-8 -->
+                    <div class="icon-group">
+                        <div class="reward-icon"><img alt="奖励6"></div>
+                        <div class="reward-icon"><img alt="奖励7"></div>
+                        <div class="reward-icon"><img alt="奖励8"></div>
+                    </div>
                 </div>
-                <!-- 预约人数（3个） -->
+                <!-- 预约人数 -->
                 <div class="reserve-counts">
                     <div class="reserve-count"><img alt="50万预约"></div>
                     <div class="reserve-count"><img alt="100万预约"></div>
                     <div class="reserve-count"><img alt="300万预约"></div>
+                </div>
+                <!-- 进度条（移至底部+调扁） -->
+                <div class="reward-progress-bar">
+                    <div class="progress-fill"></div>
                 </div>
             </div>
         </div>
